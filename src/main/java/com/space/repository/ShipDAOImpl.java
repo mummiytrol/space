@@ -44,7 +44,7 @@ public class ShipDAOImpl implements ShipDAO {
     }
 
     @Override
-    public Ship getById(int id) {
+    public Ship getById(Long id) {
         Session session = sessionFactory.getCurrentSession();
         return session.get(Ship.class, id);
     }

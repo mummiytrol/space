@@ -9,5 +9,5 @@ public interface ShipDAO {
     void add(Ship ship);
     void delete(Ship ship);
     void edit(Ship ship);
-    Ship getById(int id);
+    Ship getById(Long id);
 }

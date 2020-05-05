@@ -44,7 +44,7 @@ public class ShipServiceImpl implements ShipService {
 
     @Override
     @Transactional
-    public Ship getById(int id) {
+    public Ship getById(Long id) {
         return shipDAO.getById(id);
     }
 

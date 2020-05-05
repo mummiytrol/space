@@ -22,8 +22,8 @@ public class Ship {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private ShipType shipType;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate prodDate;
+   // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private Date prodDate;
 
     private boolean isUsed;
 
@@ -71,7 +71,7 @@ public class Ship {
         return shipType;
     }
 
-    public LocalDate getProdDate() {
+    public Date getProdDate() {
         return prodDate;
     }
 
@@ -99,7 +99,7 @@ public class Ship {
         this.shipType = shipType;
     }
 
-    public void setProdDate(LocalDate prodDate) {
+    public void setProdDate(Date prodDate) {
         this.prodDate = prodDate;
     }
 

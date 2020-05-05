@@ -3,17 +3,22 @@ package com.space.controller;
 import com.space.model.Ship;
 import com.space.model.ShipType;
 import com.space.repository.ShipRepo;
+import com.space.service.ShipService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
-@Controller
+@RestController
 @RequestMapping(path="/")
 public class ShipController {
-        private ShipRepo shipRepo;
- //   private ShipService shipService;
+ //       private ShipRepo shipRepo;
+    private ShipService shipService;
 
 //    @PostMapping(path="/add") // Map ONLY POST Requests
 //    public @ResponseBody String addNewShip(@RequestParam String name, @RequestParam Long prodDate, @RequestParam Double speed, @RequestParam Integer crewSize ) {
@@ -24,15 +29,14 @@ public class ShipController {
 //        ship.setSpeed(speed);
 //        return "Saved";
 //    }
-//    @Autowired
-//    public void setShipService(ShipService shipService) {
-//        this.shipService = shipService;
-//    }
+    @Autowired
+    public void setShipService(ShipService shipService) {
+        this.shipService = shipService;
+    }
 
     @GetMapping(path="/rest/ships")
-    public Iterable<Ship> allShips() {
-//        List<Ship> ships =
-//                shipService.allShips();
+    public ModelAndView allShips() {
+        List<Ship> ships = shipService.allShips();
 //
 //        ObjectMapper mapper = new ObjectMapper();
 //        List<ObjectMapper> shipsList = new ArrayList<>();
@@ -45,20 +49,22 @@ public class ShipController {
 //            } catch (IOException e) {
 //                e.printStackTrace();
 //            }
-        return shipRepo.findAll();
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("index");
+        modelAndView.addObject("shipsList", ships);
+//        return shipRepo.findAll();
+        return modelAndView;
         }
-//        ModelAndView modelAndView = new ModelAndView();
-//        modelAndView.setViewName("ships");
-//        modelAndView.addObject("shipsList", ships);
 
 
-    @GetMapping(path="/ships/count")
-    public Long count() {
-        return shipRepo.count();
+
+    @GetMapping(path="/rest/ships/count")
+    public Integer count() {
+               return  shipService.shipsCount();
     }
 
     @RequestMapping(value = "/ships", method = RequestMethod.POST)
-    public Ship create(@RequestParam String name, @RequestParam String planet, @RequestParam String type,
+    public ModelAndView create(@RequestParam String name, @RequestParam String planet, @RequestParam String type,
                        @RequestParam Long prodDate, @RequestParam Double speed, @RequestParam Integer crewSize) {
   //   “name”:[String],   “planet”:[String],   “shipType”:[ShipType],   “prodDate”:[Long],   “isUsed”:[Boolean], --optional, default=false   “speed”:[Double],     “crewSize”:[Integer]
         Ship ship = new Ship();
@@ -70,12 +76,21 @@ public class ShipController {
         for (ShipType shipType : ShipType.values()){
             if (shipType.name().equals(type)) ship.setShipType(shipType);
         }
-        ship.setProdDate(LocalDate.now());
-        return shipRepo.save(ship);
+        ship.setProdDate(new Date(prodDate));
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("redirect:/rest");
+        shipService.add(ship);
+        // return shipRepo.save(ship);
+        return modelAndView;
     }
 
-    @GetMapping(path="/ships/{id}")
-     public Optional<Ship> getShip(@PathVariable Long id) {
-        return shipRepo.findById(id);
+    @GetMapping(path="rest/ships/{id}")
+     public ModelAndView getShip(@PathVariable Long id) {
+        Ship ship = shipService.getById(id);
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("index");
+        modelAndView.addObject("ship", ship);
+        // return shipRepo.findById(id);
+        return modelAndView;
     }
 }
