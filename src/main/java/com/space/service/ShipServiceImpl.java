@@ -1,8 +1,7 @@
 package com.space.service;
 
-import com.space.repository.ShipDAO;
 import com.space.model.Ship;
-import com.space.repository.ShipDAOImpl;
+import com.space.repository.ShipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,44 +11,43 @@ import java.util.List;
 @Service
 public class ShipServiceImpl implements ShipService {
 
-    private ShipDAO shipDAO = new ShipDAOImpl();
-
-//    public void setShipDAO(ShipDAO shipDAO) {
-//        this.shipDAO = shipDAO;
-//    }
+    @Autowired
+    private ShipRepository repository;
 
     @Override
     @Transactional
     public List<Ship> allShips() {
-        return shipDAO.AllShips();
+        return repository.findAll();
     }
 
     @Override
     @Transactional
     public void add(Ship ship) {
-        shipDAO.add(ship);
+        repository.save(ship);
     }
 
     @Override
     @Transactional
     public void delete(Ship ship) {
-        shipDAO.delete(ship);
+        repository.delete(ship);
     }
 
     @Override
     @Transactional
     public void edit(Ship ship) {
-        shipDAO.edit(ship);
+        repository.saveAndFlush(ship);
     }
 
     @Override
     @Transactional
     public Ship getById(Long id) {
-        return shipDAO.getById(id);
+        return repository.findById(id).get();
     }
 
     @Override
+    @Transactional
     public int shipsCount() {
-        return shipDAO.AllShips().size();
+        return repository.findAll().size();
     }
+
 }

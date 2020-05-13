@@ -108,9 +108,8 @@
                 <td>${ship.prodDate}</td>
                 <td>${ship.speed}</td>
                 <td>${ship.crewSize}</td>
-                <td>rating</td>
-                <td><a href="/edit/${ship.id}">edit</a></td>
-                <td><a href="/delete/${ship.id}">delete</a></td>
+                <td>${ship.rating}</td>
+
 
             </tr>
         </c:forEach>

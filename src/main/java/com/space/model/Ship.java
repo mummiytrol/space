@@ -9,33 +9,35 @@ import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
-@Table
+@Table(name = "ship")
 public class Ship {
     @Id
+    @Column(name = "id")
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
-
+    @Column(name = "name")
     private String name;
-
+    @Column(name = "planet")
     private String planet;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @Column(name = "shipType")
+    //@JsonFormat(shape = JsonFormat.Shape.STRING)
+    @Enumerated(value = EnumType.STRING)
     private ShipType shipType;
-
+    @Column(name = "prodDate")
    // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date prodDate;
-
+    @Column(name = "isUsed")
     private boolean isUsed;
-
+    @Column(name = "speed")
     private double speed;
-
+    @Column(name = "crewSize")
     private int crewSize;
-
+    @Column(name = "rating")
     private double rating;
-/*
+
     public Ship() {
     }
-
+/*
     public Ship(String name, String planet, String shipType, LocalDate prodDate, boolean isUsed, double speed, int crewSize) {
         this.name = name;
         this.planet = planet;
@@ -119,20 +121,20 @@ public class Ship {
         this.rating = rating;
     }
 
-//    @Override
-//    public String toString() {
-//        return "{" +
-//                "id:" + id +
-//                ", name: '" + name + '\'' +
-//                ", planet: '" + planet + '\'' +
-//                ", shipType: '" + shipType + '\'' +
-//                ", prodDate: " + prodDate +
-//                ", isUsed: " + isUsed +
-//                ", speed: " + speed +
-//                ", crewSize :" + crewSize +
-//                ", rating: " + rating +
-//                '}';
-//    }
+    @Override
+    public String toString() {
+        return "{" +
+                "id:" + id +
+                ", name:'" + name + '\'' +
+                ", planet:'" + planet + '\'' +
+                ", shipType:'" + shipType + '\'' +
+                ", prodDate:" + prodDate +
+                ", isUsed:" + isUsed +
+                ", speed:" + speed +
+                ", crewSize:" + crewSize +
+                ", rating:" + rating +
+                '}';
+    }
     /*  {   “id”:[Long],
        “name”:[String],
           “planet”:[String],
