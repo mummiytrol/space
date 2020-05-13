@@ -5,8 +5,9 @@ import com.space.model.Ship;
 import java.util.List;
 
 public interface ShipService {
-    List<Ship> allShips();
-    void add(Ship ship);
+
+    List<Ship> allShips(int pageNumber, int pageSize);
+    Ship add(Ship ship);
     void delete(Ship ship);
     void edit(Ship ship);
     Ship getById(Long id);
