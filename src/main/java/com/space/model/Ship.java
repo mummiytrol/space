@@ -1,53 +1,26 @@
 package com.space.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
-@Table(name = "ship")
+@Table
 public class Ship {
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "name")
     private String name;
-    @Column(name = "planet")
     private String planet;
-    @Column(name = "shipType")
-    //@JsonFormat(shape = JsonFormat.Shape.STRING)
     @Enumerated(value = EnumType.STRING)
     private ShipType shipType;
-    @Column(name = "prodDate")
-   // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date prodDate;
-    @Column(name = "isUsed")
-    private boolean isUsed;
-    @Column(name = "speed")
-    private double speed;
-    @Column(name = "crewSize")
-    private int crewSize;
-    @Column(name = "rating")
-    private double rating;
+    private Boolean isUsed;
+    private Double speed;
+    private Integer crewSize;
+    private Double rating;
 
     public Ship() {
     }
-/*
-    public Ship(String name, String planet, String shipType, LocalDate prodDate, boolean isUsed, double speed, int crewSize) {
-        this.name = name;
-        this.planet = planet;
-        this.shipType = shipType;
-        this.prodDate = prodDate;
-        this.isUsed = isUsed;
-        this.speed = speed;
-        this.crewSize = crewSize;
-
-    } */
 
     public void setId(Long id) {
         this.id = id;
@@ -77,19 +50,19 @@ public class Ship {
         return prodDate;
     }
 
-    public boolean getUsed() {
+    public Boolean getUsed() {
         return isUsed;
     }
 
-    public double getSpeed() {
+    public Double getSpeed() {
         return speed;
     }
 
-    public int getCrewSize() {
+    public Integer getCrewSize() {
         return crewSize;
     }
 
-    public double getRating() {
+    public Double getRating() {
         return rating;
     }
 
@@ -135,11 +108,5 @@ public class Ship {
                 ", rating:" + rating +
                 '}';
     }
-    /*  {   “id”:[Long],
-       “name”:[String],
-          “planet”:[String],
-             “shipType”:[ShipType],
-                “prodDate”:[Long],   “isUsed”:[Boolean],   “speed”:[Double],     “crewSize”:[Integer],     “rating”:[Double]  },
 
-     */
 }
