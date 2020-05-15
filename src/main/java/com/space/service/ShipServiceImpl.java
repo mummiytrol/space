@@ -115,40 +115,75 @@ public class ShipServiceImpl implements ShipService {
 
     @Override
     @Transactional
-    public void edit(Ship ship, Long id) throws BadRequestException, NotFoundException {
+    public Ship edit(String name, String planet, ShipType type, Long prodDate,
+                     Boolean isUsed, Double speed, Integer crew, Long id) throws NotFoundException, BadRequestException {
+
         Ship updShip = getById(id);
-        String name = ship.getName();
-            if (notValidName(name)) throw new BadRequestException();
-            if (!name.isEmpty() && !name.equals(updShip.getName())) updShip.setName(name);
-
-        String planet = ship.getPlanet();
-            if (notValidName(planet)) throw new BadRequestException();
-            if (!planet.isEmpty() && !name.equals(updShip.getPlanet())) updShip.setPlanet(planet);
-
-        ShipType type = ship.getShipType();
-            if (type==null) throw new BadRequestException();
-            if (!type.equals(updShip.getShipType())) updShip.setShipType(type);
-
-        Date date = ship.getProdDate();
+       boolean isChange = false;
+        // String name = ship.getName();
+        if (name!=null) {
+            if (name.isEmpty() || name.length() > 50) throw new BadRequestException();
+            if (!name.equals(updShip.getName())) {
+                isChange = true;
+                updShip.setName(name);
+                System.out.println("Change Name " + name);
+            }
+        }
+      //  String planet = ship.getPlanet();
+        if (planet!=null) {
+            if (planet.length() > 50)throw new BadRequestException();
+            if (!planet.isEmpty() && !planet.equals(updShip.getPlanet())) {
+                isChange = true;
+                updShip.setPlanet(planet);
+            }
+        }
+     //   ShipType type = ship.getShipType();
+          //  if (type==null) throw new BadRequestException();
+        if (type!=null && !type.equals(updShip.getShipType())) {
+            isChange = true;
+            updShip.setShipType(type);
+        }
+        if (prodDate != null) {
+            if (prodDate <= 0) throw new BadRequestException();
+            Date date = new Date(prodDate);
             if (notValidDate(date)) throw new BadRequestException();
-            if (!date.equals(updShip.getProdDate())) updShip.setProdDate(date);
-
-        updShip.setUsed(ship.getUsed());
-        Double speed = updShip.getSpeed();
-            if (notValidSpeed(speed)) throw new BadRequestException();
-            if (speed < 0.01 || speed > 0.99) throw new BadRequestException();
-            speed = (double) Math.round(speed * 100) / 100;
-        if (!speed.equals(updShip.getSpeed())) updShip.setSpeed(speed);
-
-        Integer crew = updShip.getCrewSize();
+            if (!date.equals(updShip.getProdDate())) {
+                isChange = true;
+                updShip.setProdDate(date);
+            }
+        }
+        if (isUsed!=null && !isUsed.equals(updShip.getUsed())) {
+            isChange = true;
+            updShip.setUsed(isUsed);
+        }
+     //   Double speed = updShip.getSpeed();
+      //  Double newSpeed = null;
+        if (speed!=null) {
+             if (notValidSpeed(speed)) throw new BadRequestException();
+             speed = (double) Math.round(speed * 100.0d) / 100;
+             if (!speed.equals(updShip.getSpeed())) {
+                 isChange = true;
+                 updShip.setSpeed(speed);
+             }
+        }
+      //  Integer crew = updShip.getCrewSize();
+        if (crew!=null) {
             if (notValidCrew(crew)) throw new BadRequestException();
-        if (!crew.equals(updShip.getCrewSize())) updShip.setCrewSize(crew);
+            else
+            if (!crew.equals(updShip.getCrewSize())) {
+                isChange = true;
+                updShip.setCrewSize(crew);
+            }
+        }
+        if (isChange) {
+                int year = updShip.getProdDate().toInstant().atZone(ZoneId.systemDefault()).getYear();
+                double rating = calcRating(updShip.getSpeed(), updShip.getUsed(), year);
+                if (rating != updShip.getRating()) updShip.setRating(rating);
+            repository.save(updShip);
+        }
 
-        int year = date.toInstant().atZone(ZoneId.systemDefault()).getYear();
-
-        double rating = calcRating(speed, ship.getUsed(), year);
-        updShip.setRating(rating);
-        repository.saveAndFlush(updShip);
+        return updShip;
+        //
     }
 
     @Override

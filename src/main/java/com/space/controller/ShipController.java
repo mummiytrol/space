@@ -78,11 +78,24 @@ public class ShipController {
         return new ResponseEntity<>(ship, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "rest/ships/{id}", method = RequestMethod.POST)
-    public ResponseEntity<Ship> updateShip(@RequestBody Ship ship, @PathVariable("id") Long id) throws NotFoundException, BadRequestException {
-        if (ship == null || id == null || id <= 0) throw new BadRequestException();
-        shipService.edit(ship, id);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @RequestMapping(value = "rest/ships/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<Ship> updateShip(@RequestParam(required = false) String name,
+                                           @RequestParam(required = false) String planet,
+                                           @RequestParam(required = false) ShipType shipType,
+                                           @RequestParam(required = false) Long prodDate,
+                                           @RequestParam(required = false) Boolean isUsed,
+                                           @RequestParam(required = false) Double speed,
+                                           @RequestParam(required = false) Integer crewSize,
+                                           @PathVariable("id") Long id)
+                                            throws NotFoundException, BadRequestException {
+        if (id==null || id <= 0) throw new BadRequestException();
+//        if (name==null && planet==null && shipType==null && prodDate==null && isUsed==null &&
+//                 speed==null && crewSize==null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+ //       if (!shipService.edit(name, planet, shipType, prodDate, isUsed, speed, crewSize, id)) return new ResponseEntity<>(HttpStatus.OK);
+
+        Ship ship = shipService.edit(name, planet, shipType, prodDate, isUsed, speed, crewSize, id);
+
+        return new ResponseEntity<>(ship, HttpStatus.OK);
     }
 
     @RequestMapping(value = "rest/ships/{id}", method = RequestMethod.DELETE)

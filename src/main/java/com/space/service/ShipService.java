@@ -19,7 +19,9 @@ public interface ShipService {
 
     void delete(Long id) throws NotFoundException;
 
-    void edit(Ship newShip, Long id) throws BadRequestException, NotFoundException;
+    Ship edit(String name, String planet, ShipType type, Long prodDate,
+              Boolean isUsed, Double speed, Integer crewSize, Long id)
+                throws BadRequestException, NotFoundException;
 
     Ship getById(Long id) throws NotFoundException;
 
