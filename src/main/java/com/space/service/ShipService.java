@@ -14,9 +14,16 @@ public interface ShipService {
                         ShipType shipType, Long after, Long before, Boolean getUsed, Double minSpeed,
                         Double maxSpeed, Integer minCrewSize, Integer maxCrewSize, Double minRating,
                         Double maxRating);
+
     Ship add(Ship ship) throws BadRequestException;
+
     void delete(Long id) throws NotFoundException;
+
     void edit(Ship newShip, Long id) throws BadRequestException, NotFoundException;
+
     Ship getById(Long id) throws NotFoundException;
-    int shipsCount();
+
+    int shipsCount(String name, String planet, ShipType shipType, Long after,
+                   Long before, Boolean isUsed, Double minSpeed, Double maxSpeed,
+                   Integer minCrewSize, Integer maxCrewSize, Double minRating, Double maxRating);
 }

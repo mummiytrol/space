@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class ShipServiceImpl implements ShipService {
-    private int count;
+
     @Autowired
     private ShipRepository repository;
 
@@ -28,10 +28,30 @@ public class ShipServiceImpl implements ShipService {
                                ShipType shipType, Long after, Long before, Boolean isUsed, Double minSpeed,
                                Double maxSpeed, Integer minCrewSize, Integer maxCrewSize, Double minRating,
                                Double maxRating) {
-       // Pageable page = PageRequest.of(pageNumber, pageSize, Sort.by(order.getFieldName()));
+
         if (pageNumber==null) pageNumber = 0;
         if (pageSize==null) pageSize = 3;
-        List<Ship> ships = repository.findAll(); // repository.findAll(page).getContent();
+
+        Comparator<Ship> comparator=null;
+        if (order==null) {
+            order = ShipOrder.ID;
+        }
+        switch (order) {
+            case ID:    comparator = Comparator.comparing(Ship::getId); break;
+            case SPEED: comparator = Comparator.comparing(Ship::getSpeed); break;
+            case DATE:  comparator = Comparator.comparing(Ship::getProdDate); break;
+            case RATING: comparator = Comparator.comparing(Ship::getRating); break;
+        }
+        List<Ship> newShips = filteredShips(name, planet, shipType, after, before, isUsed,
+                                minSpeed, maxSpeed, minCrewSize, maxCrewSize, minRating, maxRating);
+        return newShips.stream().sorted(comparator).skip(pageNumber*pageSize).limit(pageSize).collect(Collectors.toList());
+    }
+
+    private List<Ship> filteredShips(String name, String planet, ShipType shipType, Long after,
+                                     Long before, Boolean isUsed, Double minSpeed, Double maxSpeed,
+                                     Integer minCrewSize, Integer maxCrewSize, Double minRating, Double maxRating) {
+
+        List<Ship> ships = repository.findAll();
         if (name!=null) {
             ships = ships.stream().filter(ship -> ship.getName().contains(name)).collect(Collectors.toList());
         }
@@ -68,19 +88,7 @@ public class ShipServiceImpl implements ShipService {
         if (maxRating != null) {
             ships = ships.stream().filter(ship -> ship.getRating() <= maxRating).collect(Collectors.toList());
         }
-        Comparator<Ship> comparator=null;
-        if (order==null) {
-            order = ShipOrder.ID;
-        }
-        switch (order) {
-            case ID:    comparator = Comparator.comparing(Ship::getId); break;
-            case SPEED: comparator = Comparator.comparing(Ship::getSpeed); break;
-            case DATE:  comparator = Comparator.comparing(Ship::getProdDate); break;
-            case RATING: comparator = Comparator.comparing(Ship::getRating); break;
-        }
-        List<Ship> filteredShips = ships.stream().sorted(comparator).collect(Collectors.toList());
-        count = filteredShips.size();
-        return filteredShips.stream().skip(pageNumber*pageSize).limit(pageSize).collect(Collectors.toList());
+        return ships;
     }
 
     @Override
@@ -111,35 +119,36 @@ public class ShipServiceImpl implements ShipService {
         Ship updShip = getById(id);
         String name = ship.getName();
             if (notValidName(name)) throw new BadRequestException();
-            if (!name.isEmpty()) updShip.setName(name);
+            if (!name.isEmpty() && !name.equals(updShip.getName())) updShip.setName(name);
 
         String planet = ship.getPlanet();
             if (notValidName(planet)) throw new BadRequestException();
-            if (!planet.isEmpty()) updShip.setPlanet(planet);
+            if (!planet.isEmpty() && !name.equals(updShip.getPlanet())) updShip.setPlanet(planet);
 
         ShipType type = ship.getShipType();
             if (type==null) throw new BadRequestException();
-            updShip.setShipType(type);
+            if (!type.equals(updShip.getShipType())) updShip.setShipType(type);
 
         Date date = ship.getProdDate();
             if (notValidDate(date)) throw new BadRequestException();
-            updShip.setProdDate(date);
+            if (!date.equals(updShip.getProdDate())) updShip.setProdDate(date);
 
         updShip.setUsed(ship.getUsed());
-        double speed = updShip.getSpeed();
+        Double speed = updShip.getSpeed();
             if (notValidSpeed(speed)) throw new BadRequestException();
-            speed = (double) Math.round(speed * 100) / 100;
             if (speed < 0.01 || speed > 0.99) throw new BadRequestException();
-        updShip.setSpeed(speed);
+            speed = (double) Math.round(speed * 100) / 100;
+        if (!speed.equals(updShip.getSpeed())) updShip.setSpeed(speed);
 
-        int crew = updShip.getCrewSize();
+        Integer crew = updShip.getCrewSize();
             if (notValidCrew(crew)) throw new BadRequestException();
-        updShip.setCrewSize(crew);
+        if (!crew.equals(updShip.getCrewSize())) updShip.setCrewSize(crew);
 
         int year = date.toInstant().atZone(ZoneId.systemDefault()).getYear();
+
         double rating = calcRating(speed, ship.getUsed(), year);
         updShip.setRating(rating);
-        repository.save(updShip);
+        repository.saveAndFlush(updShip);
     }
 
     @Override
@@ -150,8 +159,12 @@ public class ShipServiceImpl implements ShipService {
     }
 
     @Override
-    public int shipsCount() {
-        return count;
+    public int shipsCount(String name, String planet, ShipType shipType, Long after,
+                          Long before, Boolean isUsed, Double minSpeed, Double maxSpeed,
+                          Integer minCrewSize, Integer maxCrewSize, Double minRating, Double maxRating) {
+
+        return filteredShips(name, planet, shipType, after, before, isUsed,
+                minSpeed, maxSpeed, minCrewSize, maxCrewSize, minRating, maxRating).size();
     }
 
     public double calcRating(double speed, boolean isUsed, int year) {
@@ -165,7 +178,7 @@ public class ShipServiceImpl implements ShipService {
     }
 
     private boolean notValidDate(Date date) {
-        if (date==null) return true;
+        if (date == null) return true;
         int year = date.toInstant().atZone(ZoneId.systemDefault()).getYear();
         return year < 2800 || year > 3019;
     }

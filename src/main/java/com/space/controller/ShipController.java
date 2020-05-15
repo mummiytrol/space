@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,10 +26,7 @@ public class ShipController {
     }
 
     @RequestMapping(value = "rest/ships", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<List<Ship>> allShips(@RequestParam(required = false) Integer pageNumber,
-                                               @RequestParam(required = false) Integer pageSize,
-                                               @RequestParam(required = false) ShipOrder order,
-                                               @RequestParam(required = false) String name,
+    public ResponseEntity<List<Ship>> allShips(@RequestParam(required = false) String name,
                                                @RequestParam(required = false) String planet,
                                                @RequestParam(required = false) ShipType shipType,
                                                @RequestParam(required = false) Long after,
@@ -41,7 +37,10 @@ public class ShipController {
                                                @RequestParam(required = false) Integer minCrewSize,
                                                @RequestParam(required = false) Integer maxCrewSize,
                                                @RequestParam(required = false) Double minRating,
-                                               @RequestParam(required = false) Double maxRating) {
+                                               @RequestParam(required = false) Double maxRating,
+                                               @RequestParam(required = false) ShipOrder order,
+                                               @RequestParam(required = false) Integer pageNumber,
+                                               @RequestParam(required = false) Integer pageSize) {
 
         List<Ship> ships = shipService.allShips(pageNumber, pageSize, order, name, planet, shipType,
                             after, before, isUsed, minSpeed, maxSpeed, minCrewSize, maxCrewSize, minRating, maxRating);
@@ -49,12 +48,26 @@ public class ShipController {
     }
 
     @GetMapping(path="/rest/ships/count")
-    public Integer count() {
-               return  shipService.shipsCount();
+    public Integer count(@RequestParam(required = false) String name,
+                         @RequestParam(required = false) String planet,
+                         @RequestParam(required = false) ShipType shipType,
+                         @RequestParam(required = false) Long after,
+                         @RequestParam(required = false) Long before,
+                         @RequestParam(required = false) Boolean isUsed,
+                         @RequestParam(required = false) Double minSpeed,
+                         @RequestParam(required = false) Double maxSpeed,
+                         @RequestParam(required = false) Integer minCrewSize,
+                         @RequestParam(required = false) Integer maxCrewSize,
+                         @RequestParam(required = false) Double minRating,
+                         @RequestParam(required = false) Double maxRating) {
+
+               return  shipService.shipsCount(name, planet, shipType, after, before, isUsed,
+                       minSpeed, maxSpeed, minCrewSize, maxCrewSize, minRating, maxRating);
     }
 
     @RequestMapping(value = "rest/ships/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Ship> getShip(@PathVariable("id") Long id) throws NotFoundException {
+    public ResponseEntity<Ship> getShip(@PathVariable("id") Long id) throws NotFoundException, BadRequestException {
+        if (id==null || id <= 0) throw new BadRequestException();
         Ship ship = shipService.getById(id);
         return new ResponseEntity<>(ship, HttpStatus.OK);
     }
@@ -67,14 +80,15 @@ public class ShipController {
 
     @RequestMapping(value = "rest/ships/{id}", method = RequestMethod.POST)
     public ResponseEntity<Ship> updateShip(@RequestBody Ship ship, @PathVariable("id") Long id) throws NotFoundException, BadRequestException {
-        if (id==null || id <= 0) throw new BadRequestException();
+        if (ship == null || id == null || id <= 0) throw new BadRequestException();
         shipService.edit(ship, id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "rest/ships/{id}", method = RequestMethod.DELETE)
-    public void deleteShip(@PathVariable("id") Long id) throws NotFoundException, BadRequestException {
+    public ResponseEntity<Ship> deleteShip(@PathVariable("id") Long id) throws NotFoundException, BadRequestException {
         if (id==null || id <= 0) throw new BadRequestException();
         shipService.delete(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
