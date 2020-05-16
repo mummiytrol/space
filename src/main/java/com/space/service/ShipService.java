@@ -6,6 +6,7 @@ import com.space.exception.NotFoundException;
 import com.space.model.Ship;
 import com.space.model.ShipType;
 
+import java.util.Date;
 import java.util.List;
 
 public interface ShipService {
@@ -19,7 +20,7 @@ public interface ShipService {
 
     void delete(Long id) throws NotFoundException;
 
-    Ship edit(String name, String planet, ShipType type, Long prodDate,
+    Ship edit(String name, String planet, ShipType type, Date prodDate,
               Boolean isUsed, Double speed, Integer crewSize, Long id)
                 throws BadRequestException, NotFoundException;
 

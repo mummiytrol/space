@@ -79,23 +79,14 @@ public class ShipController {
     }
 
     @RequestMapping(value = "rest/ships/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Ship> updateShip(@RequestParam(required = false) String name,
-                                           @RequestParam(required = false) String planet,
-                                           @RequestParam(required = false) ShipType shipType,
-                                           @RequestParam(required = false) Long prodDate,
-                                           @RequestParam(required = false) Boolean isUsed,
-                                           @RequestParam(required = false) Double speed,
-                                           @RequestParam(required = false) Integer crewSize,
+    public ResponseEntity<Ship> updateShip(@RequestBody(required = false) Ship ship,
                                            @PathVariable("id") Long id)
                                             throws NotFoundException, BadRequestException {
         if (id==null || id <= 0) throw new BadRequestException();
-//        if (name==null && planet==null && shipType==null && prodDate==null && isUsed==null &&
-//                 speed==null && crewSize==null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
- //       if (!shipService.edit(name, planet, shipType, prodDate, isUsed, speed, crewSize, id)) return new ResponseEntity<>(HttpStatus.OK);
+        Ship newShip = shipService.edit(ship.getName(), ship.getPlanet(), ship.getShipType(), ship.getProdDate(),
+                ship.getUsed(), ship.getSpeed(), ship.getCrewSize(), id);
 
-        Ship ship = shipService.edit(name, planet, shipType, prodDate, isUsed, speed, crewSize, id);
-
-        return new ResponseEntity<>(ship, HttpStatus.OK);
+        return new ResponseEntity<>(newShip, HttpStatus.OK);
     }
 
     @RequestMapping(value = "rest/ships/{id}", method = RequestMethod.DELETE)

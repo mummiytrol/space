@@ -115,7 +115,7 @@ public class ShipServiceImpl implements ShipService {
 
     @Override
     @Transactional
-    public Ship edit(String name, String planet, ShipType type, Long prodDate,
+    public Ship edit(String name, String planet, ShipType type, Date date,
                      Boolean isUsed, Double speed, Integer crew, Long id) throws NotFoundException, BadRequestException {
 
         Ship updShip = getById(id);
@@ -143,9 +143,9 @@ public class ShipServiceImpl implements ShipService {
             isChange = true;
             updShip.setShipType(type);
         }
-        if (prodDate != null) {
-            if (prodDate <= 0) throw new BadRequestException();
-            Date date = new Date(prodDate);
+        if (date != null) {
+           // if (prodDate <= 0) throw new BadRequestException();
+         //   Date date = new Date(prodDate);
             if (notValidDate(date)) throw new BadRequestException();
             if (!date.equals(updShip.getProdDate())) {
                 isChange = true;
@@ -179,11 +179,9 @@ public class ShipServiceImpl implements ShipService {
                 int year = updShip.getProdDate().toInstant().atZone(ZoneId.systemDefault()).getYear();
                 double rating = calcRating(updShip.getSpeed(), updShip.getUsed(), year);
                 if (rating != updShip.getRating()) updShip.setRating(rating);
-            repository.save(updShip);
         }
 
         return updShip;
-        //
     }
 
     @Override
