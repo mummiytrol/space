@@ -43,7 +43,8 @@ public class ShipController {
                                                @RequestParam(required = false) Integer pageSize) {
 
         List<Ship> ships = shipService.allShips(pageNumber, pageSize, order, name, planet, shipType,
-                            after, before, isUsed, minSpeed, maxSpeed, minCrewSize, maxCrewSize, minRating, maxRating);
+                            after, before, isUsed, minSpeed, maxSpeed, minCrewSize, maxCrewSize,
+                            minRating, maxRating);
         return new ResponseEntity<>(ships, HttpStatus.OK);
     }
 
@@ -61,7 +62,7 @@ public class ShipController {
                          @RequestParam(required = false) Double minRating,
                          @RequestParam(required = false) Double maxRating) {
 
-               return  shipService.shipsCount(name, planet, shipType, after, before, isUsed,
+        return  shipService.shipsCount(name, planet, shipType, after, before, isUsed,
                        minSpeed, maxSpeed, minCrewSize, maxCrewSize, minRating, maxRating);
     }
 
@@ -80,8 +81,8 @@ public class ShipController {
 
     @RequestMapping(value = "rest/ships/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Ship> updateShip(@RequestBody(required = false) Ship ship,
-                                           @PathVariable("id") Long id)
-                                            throws NotFoundException, BadRequestException {
+                                           @PathVariable("id") Long id) throws NotFoundException, BadRequestException {
+
         if (id==null || id <= 0) throw new BadRequestException();
         Ship newShip = shipService.edit(ship.getName(), ship.getPlanet(), ship.getShipType(), ship.getProdDate(),
                 ship.getUsed(), ship.getSpeed(), ship.getCrewSize(), id);

@@ -118,70 +118,49 @@ public class ShipServiceImpl implements ShipService {
     public Ship edit(String name, String planet, ShipType type, Date date,
                      Boolean isUsed, Double speed, Integer crew, Long id) throws NotFoundException, BadRequestException {
 
-        Ship updShip = getById(id);
-       boolean isChange = false;
-        // String name = ship.getName();
+        Ship updatedShip = getById(id);
         if (name!=null) {
             if (name.isEmpty() || name.length() > 50) throw new BadRequestException();
-            if (!name.equals(updShip.getName())) {
-                isChange = true;
-                updShip.setName(name);
-                System.out.println("Change Name " + name);
+            if (!name.equals(updatedShip.getName())) {
+                updatedShip.setName(name);
             }
         }
-      //  String planet = ship.getPlanet();
         if (planet!=null) {
-            if (planet.length() > 50)throw new BadRequestException();
-            if (!planet.isEmpty() && !planet.equals(updShip.getPlanet())) {
-                isChange = true;
-                updShip.setPlanet(planet);
+            if (planet.isEmpty() || planet.length() > 50) throw new BadRequestException();
+            if (!planet.equals(updatedShip.getPlanet())) {
+                updatedShip.setPlanet(planet);
             }
         }
-     //   ShipType type = ship.getShipType();
-          //  if (type==null) throw new BadRequestException();
-        if (type!=null && !type.equals(updShip.getShipType())) {
-            isChange = true;
-            updShip.setShipType(type);
+        if (type!=null && !type.equals(updatedShip.getShipType())) {
+            updatedShip.setShipType(type);
         }
         if (date != null) {
-           // if (prodDate <= 0) throw new BadRequestException();
-         //   Date date = new Date(prodDate);
             if (notValidDate(date)) throw new BadRequestException();
-            if (!date.equals(updShip.getProdDate())) {
-                isChange = true;
-                updShip.setProdDate(date);
+            if (!date.equals(updatedShip.getProdDate())) {
+                updatedShip.setProdDate(date);
             }
         }
-        if (isUsed!=null && !isUsed.equals(updShip.getUsed())) {
-            isChange = true;
-            updShip.setUsed(isUsed);
+        if (isUsed!=null && !isUsed.equals(updatedShip.getUsed())) {
+            updatedShip.setUsed(isUsed);
         }
-     //   Double speed = updShip.getSpeed();
-      //  Double newSpeed = null;
         if (speed!=null) {
              if (notValidSpeed(speed)) throw new BadRequestException();
              speed = (double) Math.round(speed * 100.0d) / 100;
-             if (!speed.equals(updShip.getSpeed())) {
-                 isChange = true;
-                 updShip.setSpeed(speed);
+             if (!speed.equals(updatedShip.getSpeed())) {
+                 updatedShip.setSpeed(speed);
              }
         }
-      //  Integer crew = updShip.getCrewSize();
         if (crew!=null) {
             if (notValidCrew(crew)) throw new BadRequestException();
             else
-            if (!crew.equals(updShip.getCrewSize())) {
-                isChange = true;
-                updShip.setCrewSize(crew);
+            if (!crew.equals(updatedShip.getCrewSize())) {
+                updatedShip.setCrewSize(crew);
             }
         }
-        if (isChange) {
-                int year = updShip.getProdDate().toInstant().atZone(ZoneId.systemDefault()).getYear();
-                double rating = calcRating(updShip.getSpeed(), updShip.getUsed(), year);
-                if (rating != updShip.getRating()) updShip.setRating(rating);
-        }
-
-        return updShip;
+            int year = updatedShip.getProdDate().toInstant().atZone(ZoneId.systemDefault()).getYear();
+            double rating = calcRating(updatedShip.getSpeed(), updatedShip.getUsed(), year);
+            if (rating != updatedShip.getRating()) updatedShip.setRating(rating);
+        return updatedShip;
     }
 
     @Override
@@ -202,8 +181,8 @@ public class ShipServiceImpl implements ShipService {
 
     public double calcRating(double speed, boolean isUsed, int year) {
         double k = isUsed ? 0.5d : 1.0d;
-        double result = 80 * k * speed / (3020 - year);
-        return (double) Math.round(result*100) / 100;
+        double result = 80.0d * k * speed / (3020 - year);
+        return (double) Math.round(result*100.0d) / 100;
     }
 
     private boolean notValidName(String name) {
